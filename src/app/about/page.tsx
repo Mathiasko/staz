@@ -1,18 +1,22 @@
 import FactCard from "../components/card";
 
+interface FactResponse {
+  text?: string;
+  source?: string;
+}
+
 export default async function About() {
-  async function getFact(uniqueId = 1) {
+  async function getFact(uniqueId = 1): Promise<FactResponse> {
     const res = await fetch(
       `https://uselessfacts.jsph.pl/api/v2/facts/random?t=${Date.now()}-${uniqueId*10}`,
     );
     if (!res.ok) {
       throw new Error("Failed to fetch data");
     }
-    return res.json();
+    return (await res.json()) as FactResponse;
   }
 
   const facts = await Promise.all([getFact(), getFact(), getFact()]);
-  const name = "John Doe";
   return (
     <>
       <h1 className="text-5xl font-bold">About </h1>
@@ -25,8 +29,8 @@ export default async function About() {
       {[0, 1, 2].map((item) => (
         <FactCard
           key={item}
-          factText={facts[item]?.text || ""}
-          author={facts[item]?.source || ""}
+          factText={facts[item]?.text ?? ""}
+          author={facts[item]?.source ?? ""}
         />
       ))}
     </>
